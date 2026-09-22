@@ -1,0 +1,10 @@
+{
+	"schema": 1,
+	"upstream": {
+		"repo": "cursor/plugins",
+		"ref": "main",
+		"path": "pstack",
+		"sourceCommit": null,
+		"version": "0.15.0"
+	}
+}

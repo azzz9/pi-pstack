@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { execFileSync } from "node:child_process";
 import {
 	existsSync,
 	lstatSync,
@@ -19,6 +20,10 @@ export const PI_HARNESS_FIXES = JSON.parse(
 );
 
 export const DISCOVERABLE = ["how", "typescript-best-practices", "unslop", "why"];
+
+// The sync point check-upstream.mjs compares against. See FORK.md.
+export const LOCK_REL = "upstream.lock.json";
+const UPSTREAM_VERSION_REL = ".cursor-plugin/plugin.json";
 
 const EXTENSION_COMMANDS = new Set(["/poteto-mode", "/setup-pstack", "/pstack"]);
 
@@ -439,6 +444,49 @@ function readOptional(path) {
 	return existsSync(path) ? readFileSync(path, "utf8") : "";
 }
 
+export function gitOut(repo, args) {
+	return execFileSync("git", ["-C", repo, ...args], { encoding: "utf8" }).trim();
+}
+
+// What the sync actually took: the checkout commit, plus the upstream version
+// its files claim. The pstack-scoped commit is derived from this later, so a
+// depth-1 sparse clone is enough.
+export function readSourceIdentity(fromRoot) {
+	const commit = gitOut(fromRoot, ["rev-parse", "HEAD"]);
+	const versionPath = join(fromRoot, UPSTREAM_VERSION_REL);
+	let version = null;
+	if (existsSync(versionPath)) {
+		try {
+			const doc = JSON.parse(readFileSync(versionPath, "utf8"));
+			if (typeof doc.version === "string") version = doc.version;
+		} catch {
+			version = null;
+		}
+	}
+	return { commit, version };
+}
+
+export function upstreamLockText(identity) {
+	const lock = {
+		schema: 1,
+		upstream: {
+			repo: "cursor/plugins",
+			ref: "main",
+			path: "pstack",
+			sourceCommit: identity.commit,
+			version: identity.version,
+		},
+	};
+	return `${JSON.stringify(lock, null, "\t")}\n`;
+}
+
+// Written only after a sync has fully applied and passed its seam assertion, so
+// the lock can never claim a sync that failed. No clock field: an unchanged
+// upstream must leave an unchanged file.
+export function writeUpstreamLock(destRoot, identity) {
+	return writeIfChanged(join(destRoot, LOCK_REL), upstreamLockText(identity));
+}
+
 function needsCatalogCounts(to, counts) {
 	const text = readOptional(join(to, "extensions/pstack/skill-catalog.test.ts"));
 	return (
@@ -819,8 +867,15 @@ export function main(argv = process.argv.slice(2)) {
 		printPlan(planned);
 		return;
 	}
+	// Read the identity first: a checkout that is not a git work tree must fail
+	// before any destination file is rewritten.
+	const identity = readSourceIdentity(args.from);
 	apply(planned);
 	assertNoCursorSeams(args.to);
+	writeUpstreamLock(args.to, identity);
+	console.log(
+		`${LOCK_REL}: synced from ${identity.commit.slice(0, 8)} (Cursor pstack ${identity.version ?? "version unknown"})`,
+	);
 }
 
 const isMain =

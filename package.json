@@ -34,7 +34,8 @@
 		"README.md",
 		"LICENSE",
 		"FORK.md",
-		"scripts/"
+		"scripts/",
+		"upstream.lock.json"
 	],
 	"peerDependencies": {
 		"@earendil-works/pi-coding-agent": "*"
@@ -53,7 +54,8 @@
 		}
 	},
 	"scripts": {
-		"test": "node --experimental-strip-types --test extensions/pstack/*.test.ts skills/poteto-mode/scripts/check-plan.test.mjs scripts/reground-from-cursor.test.mjs",
-		"reground": "node --experimental-strip-types scripts/reground-from-cursor.mjs"
+		"test": "node --experimental-strip-types --test extensions/pstack/*.test.ts skills/poteto-mode/scripts/check-plan.test.mjs scripts/reground-from-cursor.test.mjs scripts/check-upstream.test.mjs",
+		"reground": "node --experimental-strip-types scripts/reground-from-cursor.mjs",
+		"check-upstream": "node scripts/check-upstream.mjs"
 	}
 }
