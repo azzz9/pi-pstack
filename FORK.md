@@ -4,7 +4,8 @@ This is a personal pi fork of [`@zenspc/pi-pstack`](https://www.npmjs.com/packag
 (upstream gitHead `10eb5399458a3946d287edba8d6cbfcf16952658`), which ports
 [`cursor/plugins/pstack`](https://github.com/cursor/plugins/tree/main/pstack) to pi.
 
-License stays MIT, copyright Lauren Tan. See `LICENSE`.
+License stays MIT. `LICENSE` keeps Lauren Tan's copyright notice and adds the modification
+copyright. See [License](#license).
 
 ## Why this fork exists
 
@@ -38,6 +39,20 @@ pi install git:github.com/azzz9/pi-pstack@<sha>
 ```
 
 `pi-subagents` is required for `comment-sicko`, `poteto-agent`, and the workflow fan-outs.
+
+## License
+
+MIT. The chain of authorship is this.
+
+| Layer | Copyright |
+| --- | --- |
+| `cursor/plugins/pstack` | Copyright (c) 2026 Lauren Tan |
+| `@zenspc/pi-pstack` port | dhairyaar, MIT, Lauren Tan's notice preserved |
+| This fork | Modifications Copyright (c) 2026 azzz9 |
+
+`LICENSE` carries the original notice and the modification notice, which is what MIT requires
+for a copy or a substantial portion. The `skills/` prose and the extension code are covered by
+the same license.
 
 ## Syncing with Cursor upstream
 
