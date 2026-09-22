@@ -1,0 +1,280 @@
+{
+	"rules": [
+		{
+			"file": "skills/architect/SKILL.md",
+			"old": "Open a todolist with one entry per phase before starting.",
+			"new": "Open the `todo` list with one entry per phase before starting."
+		},
+		{
+			"file": "skills/arena/SKILL.md",
+			"old": "Open a todolist with one entry per phase before launching anything.",
+			"new": "Open the `todo` list with one entry per phase before launching anything."
+		},
+		{
+			"file": "skills/arena/SKILL.md",
+			"old": "Spawn all N subagents in one message with `run_in_background: true`, each with the task, the path to the shared grounding, its own output path, and instructions to produce both the artifact and a short rationale.",
+			"new": "Spawn all N subagents in one message with `async: true`, each with the task, the path to the shared grounding, its own output path, and instructions to produce both the artifact and a short rationale."
+		},
+		{
+			"file": "skills/automate-me/SKILL.md",
+			"old": "Locate the active workspace's transcripts before fanning out. The system prompt names the workspace's `agent-transcripts/` directory. Use only that path. Don't glob across `~/.pi/agent/sessions/`. That crosses workspace boundaries and reads private chats from unrelated projects.",
+			"new": "Locate the active workspace's transcripts before fanning out. Use `$PI_SESSION_FILE`, or `~/.pi/agent/sessions/--<cwd>--/`. Use only that path. Don't glob across other workspace directories under `~/.pi/agent/sessions/`. That crosses workspace boundaries and reads private chats from unrelated projects."
+		},
+		{
+			"file": "skills/figure-it-out/SKILL.md",
+			"old": "Open a todolist whose first item is to read the Principles section of the **poteto-mode** skill. Then add the phases below as todos.",
+			"new": "Open the `todo` list whose first item is to read the Principles section of the **poteto-mode** skill. Then add the phases below as todos."
+		},
+		{
+			"file": "skills/figure-it-out/SKILL.md",
+			"old": "Then execute the design. Add its steps to the todolist as concrete items, after the Phase C entry and before Phase D. Run each under the Phase C loop discipline, and weave the Phase D log through them, a row as each step lands, rather than saving the whole trail for the end.",
+			"new": "Then execute the design. Add its steps to the `todo` list as concrete items, after the Phase C entry and before Phase D. Run each under the Phase C loop discipline, and weave the Phase D log through them, a row as each step lands, rather than saving the whole trail for the end."
+		},
+		{
+			"file": "skills/no-comments/SKILL.md",
+			"old": "1. Spawn `Task` with `subagent({ agent: \"comment-sicko\", task })`. Pass the scope. Do not restate its rules.",
+			"new": "1. Spawn `subagent({ agent: \"comment-sicko\", task })`. Pass the scope. Do not restate its rules."
+		},
+		{
+			"file": "skills/poteto-mode/playbooks/autopilot-full.md",
+			"old": "2. **Spawn one owner per PR with the full lifecycle and an early trail.** Resolve the forge once for the program. GitHub CLI (`gh`) is the default. If `command -v origin` succeeds and Origin can resolve the repository, use `origin pr ...` for PR create, edit, view, watch, and merge operations. Otherwise stay on `gh` and record the fallback. Never require Graphite (`gt`). One Cursor cloud agent per PR owns build, the first push, a ready PR, self-proof on the real artifact (the **prove-it-works** principle skill), skeptical Bugbot triage per `../references/bugbot-triage.md`, a slop-strip (the **deslop** skill (`/skill:deslop`)), `/skill:no-comments` (the **no-comments** skill), a rebase onto current trunk, the babysit loop to green (`playbooks/babysit.md`), and the merge itself. Within about 15 minutes, every owner starts a `decisions.tsv` trail per the **show-me-your-work** skill, pushes its first branch snapshot, and opens the PR ready, never draft. Open the PR before self-proof so the URL, decisions, and checks form a durable trail. Keep `decisions.tsv` uncommitted and return it with the reports. The rebase always precedes babysit and never waits for drift or conflicts. The merge is the one step an owner may not take alone. Step 4 gates it.",
+			"new": "2. **Spawn one owner per PR with the full lifecycle and an early trail.** Resolve the forge once for the program. GitHub CLI (`gh`) is the default. If `command -v origin` succeeds and Origin can resolve the repository, use `origin pr ...` for PR create, edit, view, watch, and merge operations. Otherwise stay on `gh` and record the fallback. Never require Graphite (`gt`). One owner subagent per PR owns build, the first push, a ready PR, self-proof on the real artifact (the **prove-it-works** principle skill), skeptical review-automation triage per `../references/review-triage.md`, a slop-strip (the **deslop** skill (`/skill:deslop`)), `/skill:no-comments` (the **no-comments** skill), a rebase onto current trunk, the babysit loop to green (`playbooks/babysit.md`), and the merge itself. Within about 15 minutes, every owner starts a `decisions.tsv` trail per the **show-me-your-work** skill, pushes its first branch snapshot, and opens the PR ready, never draft. Open the PR before self-proof so the URL, decisions, and checks form a durable trail. Keep `decisions.tsv` uncommitted and return it with the reports. The rebase always precedes babysit and never waits for drift or conflicts. The merge is the one step an owner may not take alone. Step 4 gates it."
+		},
+		{
+			"file": "skills/poteto-mode/playbooks/autopilot-full.md",
+			"old": "6. **Run the root layer.** A genuinely new raise of a pinned gate or budget value (a limit CI only lets tighten) needs your fresh countersign, granted only after verifier proof. Absorbing values that already landed on main is drift, not a raise. Run an audit tick over all owners roughly every 30 minutes. A local root arms each tick as a real terminal a recurring wake. The loop uses a monitored-shell 30-minute sleep and emits an output-notification sentinel. A cloud root uses the existing cloud-sleeper wake chain instead. Never leave the cadence to memory or lossy completion notifications. At each tick, re-read this playbook from trunk with `git show origin/main:pstack/skills/poteto-mode/playbooks/autopilot-full.md`, then re-read the armed `/goal`. Audit the operation against both. Fix drift during that tick. Probe each owner with a generic liveness or status check, and collect the decision trails. Count only side effects as progress: commits, pushes, PR or check deltas, and store reports. Treat a lane that passes its expected runtime without a side effect as stuck. Stand it down and dispatch a replacement at once. Do not wait for a polite return. When merges batch, run a retro pass and a post-merge bot-comment sweep.",
+			"new": "6. **Run the root layer.** A genuinely new raise of a pinned gate or budget value (a limit CI only lets tighten) needs your fresh countersign, granted only after verifier proof. Absorbing values that already landed on main is drift, not a raise. Run an audit tick over all owners roughly every 30 minutes. The root arms each tick as a recurring wake. The loop uses a monitored-shell 30-minute sleep and emits an output-notification sentinel. A root that is not a long-running terminal session rearms the same wake on each turn. Never leave the cadence to memory or lossy completion notifications. At each tick, re-read this playbook from trunk with `git show origin/main:pstack/skills/poteto-mode/playbooks/autopilot-full.md`, then re-read the armed `/goal`. Audit the operation against both. Fix drift during that tick. Probe each owner with a generic liveness or status check, and collect the decision trails. Count only side effects as progress: commits, pushes, PR or check deltas, and store reports. Treat a lane that passes its expected runtime without a side effect as stuck. Stand it down and dispatch a replacement at once. Do not wait for a polite return. When merges batch, run a retro pass and a post-merge bot-comment sweep."
+		},
+		{
+			"file": "skills/poteto-mode/playbooks/autopilot-stack.md",
+			"old": "1. **Run the owner loop unchanged.** Resolve the forge once for the program. GitHub CLI (`gh`) is the default. If `command -v origin` succeeds and Origin can resolve the repository, use `origin pr ...` for PR create, edit, view, watch, and merge operations. Otherwise stay on `gh` and record the fallback. Never require Graphite (`gt`). One Cursor cloud agent per PR owns its change end to end: build, first push, a ready PR opened before self-proof, self-proof (gates, CI, receipts), skeptical Bugbot triage per `../references/bugbot-triage.md`, a slop-strip (the **deslop** skill (`/skill:deslop`)), `/skill:no-comments` (the **no-comments** skill), and babysit to green per `playbooks/babysit.md`. Owners parallelize when the work is self-contained. Within about 15 minutes, every owner starts a `decisions.tsv` trail per the **show-me-your-work** skill, pushes its first branch snapshot, and opens the PR ready, never draft. Keep the trail uncommitted and return it in the report.",
+			"new": "1. **Run the owner loop unchanged.** Resolve the forge once for the program. GitHub CLI (`gh`) is the default. If `command -v origin` succeeds and Origin can resolve the repository, use `origin pr ...` for PR create, edit, view, watch, and merge operations. Otherwise stay on `gh` and record the fallback. Never require Graphite (`gt`). One owner subagent per PR owns its change end to end: build, first push, a ready PR opened before self-proof, self-proof (gates, CI, receipts), skeptical review-automation triage per `../references/review-triage.md`, a slop-strip (the **deslop** skill (`/skill:deslop`)), `/skill:no-comments` (the **no-comments** skill), and babysit to green per `playbooks/babysit.md`. Owners parallelize when the work is self-contained. Within about 15 minutes, every owner starts a `decisions.tsv` trail per the **show-me-your-work** skill, pushes its first branch snapshot, and opens the PR ready, never draft. Keep the trail uncommitted and return it in the report."
+		},
+		{
+			"file": "skills/poteto-mode/playbooks/autopilot-stack.md",
+			"old": "2. **Audit on the wake chain.** The root runs an audit tick roughly every 30 minutes. A local root arms each tick as a real terminal a recurring wake. The loop uses a monitored-shell 30-minute sleep and emits an output-notification sentinel. A cloud root uses the existing cloud-sleeper wake chain instead. Never leave the cadence to memory or lossy completion notifications. At each tick, re-read this playbook from trunk with `git show origin/main:pstack/skills/poteto-mode/playbooks/autopilot-stack.md`, then re-read the armed `/goal`. Audit the operation against both. Fix drift during that tick. Probe each owner with a generic liveness or status check. Count only side effects as progress: commits, pushes, PR or check deltas, and store reports. Treat a lane that passes its expected runtime without a side effect as stuck. Stand it down and dispatch a replacement at once. Do not wait for a polite return.",
+			"new": "2. **Audit on the wake chain.** The root runs an audit tick roughly every 30 minutes. The root arms each tick as a recurring wake. The loop uses a monitored-shell 30-minute sleep and emits an output-notification sentinel. A root that is not a long-running terminal session rearms the same wake on each turn. Never leave the cadence to memory or lossy completion notifications. At each tick, re-read this playbook from trunk with `git show origin/main:pstack/skills/poteto-mode/playbooks/autopilot-stack.md`, then re-read the armed `/goal`. Audit the operation against both. Fix drift during that tick. Probe each owner with a generic liveness or status check. Count only side effects as progress: commits, pushes, PR or check deltas, and store reports. Treat a lane that passes its expected runtime without a side effect as stuck. Stand it down and dispatch a replacement at once. Do not wait for a polite return."
+		},
+		{
+			"file": "skills/poteto-mode/playbooks/babysit.md",
+			"old": "8. **Bugbot is triaged skeptically, always.** Verify each claim against the code per `../references/bugbot-triage.md`. Fix real findings with a red-first proof in the lowest PR that owns the code, never at the tip unless the owning PR has merged. In that case, use step 4's sanctioned follow-up PR. Per step 2, upstack fixes wait for step 5's next frontier-driven push wave. Push that wave before replying so the reply cites the commit. On Origin, reply with `origin pr thread reply <thread-id> <pr> --body-file <reply-file>`. On GitHub, call `gh api --method POST \"repos/<owner>/<repo>/pulls/<pr>/comments/<comment-id>/replies\" --input <payload.json>` and put the reply body in the JSON file as data. Never interpolate comment text or a reply into a shell command. Dismiss noise with the concrete disproof on the thread. On GitHub, use the watcher's Bugbot pass count. On Origin, derive the pass count from `origin pr thread list` and the review history. From the third pass on, lean toward dismissing documented patterns, still escalating anything touching security, auth, billing, data, or migrations rather than dismissing it yourself. Never churn code to quiet a bot.",
+			"new": "8. **Review-automation comments are triaged skeptically, always.** Verify each claim against the code per `../references/review-triage.md`. Fix real findings with a red-first proof in the lowest PR that owns the code, never at the tip unless the owning PR has merged. In that case, use step 4's sanctioned follow-up PR. Per step 2, upstack fixes wait for step 5's next frontier-driven push wave. Push that wave before replying so the reply cites the commit. On Origin, reply with `origin pr thread reply <thread-id> <pr> --body-file <reply-file>`. On GitHub, call `gh api --method POST \"repos/<owner>/<repo>/pulls/<pr>/comments/<comment-id>/replies\" --input <payload.json>` and put the reply body in the JSON file as data. Never interpolate comment text or a reply into a shell command. Dismiss noise with the concrete disproof on the thread. On GitHub, use the watcher's review-automation pass count. On Origin, derive the pass count from `origin pr thread list` and the review history. From the third pass on, lean toward dismissing documented patterns, still escalating anything touching security, auth, billing, data, or migrations rather than dismissing it yourself. Never churn code to quiet a bot."
+		},
+		{
+			"file": "skills/poteto-mode/playbooks/babysit.md",
+			"old": "9. **Stop at the human's line.** Owner approval is a wait, not a blocker to fix. Babysitting never authorizes merging. Only an explicit request to merge, land, ship, or merge when ready does. Route that request to Shipping. Surface the escalation and keep working the rest. After GitHub reports `READY`, a queued `WAITING`/`merge-queue` stop, or `COMPLETE`, or after Origin reports the frontier merge-ready, sweep the run's triage decisions once. Offer any team-useful dismissal pattern as a candidate entry in the shared rubric (`../references/bugbot-triage.md`) and its own PR. Never keep it only in private memory.",
+			"new": "9. **Stop at the human's line.** Owner approval is a wait, not a blocker to fix. Babysitting never authorizes merging. Only an explicit request to merge, land, ship, or merge when ready does. Route that request to Shipping. Surface the escalation and keep working the rest. After GitHub reports `READY`, a queued `WAITING`/`merge-queue` stop, or `COMPLETE`, or after Origin reports the frontier merge-ready, sweep the run's triage decisions once. Offer any team-useful dismissal pattern as a candidate entry in the shared rubric (`../references/review-triage.md`) and its own PR. Never keep it only in private memory."
+		},
+		{
+			"file": "skills/poteto-mode/playbooks/eval.md",
+			"old": "6. **Verify the chain from transcripts, not self-report.** Read each candidate's local transcript under the active workspace's `agent-transcripts/` directory (the system prompt names this path). Do not glob across `~/.pi/agent/sessions/`. That crosses workspace boundaries and reads private chats from unrelated projects. Look at which files each candidate actually opened. Grade chain-following from the files it really read plus the shape of the code, never from the candidate's own claims.",
+			"new": "6. **Verify the chain from transcripts, not self-report.** Read each candidate's local transcript from `$PI_SESSION_FILE`, or from `~/.pi/agent/sessions/--<cwd>--/`. Do not glob across other workspace directories under `~/.pi/agent/sessions/`. That crosses workspace boundaries and reads private chats from unrelated projects. Look at which files each candidate actually opened. Grade chain-following from the files it really read plus the shape of the code, never from the candidate's own claims."
+		},
+		{
+			"file": "skills/poteto-mode/playbooks/multi-phase-plan.md",
+			"old": "- [ ] Arm the 30-minute audit tick. In a local session, a real terminal a recurring wake. In a cloud root, a cloud-sleeper wake chain. Never leave the cadence to memory.",
+			"new": "- [ ] Arm the 30-minute audit tick. In a long-running terminal session, arm a recurring wake. Otherwise rearm the same wake on each turn. Never leave the cadence to memory."
+		},
+		{
+			"file": "skills/poteto-mode/playbooks/multi-phase-plan.md",
+			"old": "- [ ] Triage every Bugbot and security-reviewer comment per `../references/bugbot-triage.md`.",
+			"new": "- [ ] Triage every review-automation and security-reviewer comment per `../references/review-triage.md`."
+		},
+		{
+			"file": "skills/poteto-mode/playbooks/multi-phase-plan.md",
+			"old": "- [ ] Bugbot triage done.",
+			"new": "- [ ] Review-automation triage done."
+		},
+		{
+			"file": "skills/poteto-mode/playbooks/orchestrate.md",
+			"old": "- **Worker / verifier.** Always `environment: \"cloud\"` unless the task needs this machine: the project's verification skill or harness runtime verification (from the project's verification skill). Reading local transcripts under `agent-transcripts/`. Simulators and local IDE state. Auth that exists only here. Cloud agents cannot read the local store, so their briefs inline what they need or point at repo paths. Prefer fewer, broader workers. One writer per worktree or branch (principle-separate-before-serializing-shared-state). Run a unit's verifier on a different model family from its worker.",
+			"new": "- **Worker / verifier.** Always run in an isolated worktree (`worktree: true`) unless the task needs this machine: the project's verification skill or harness runtime verification (from the project's verification skill). Reading local transcripts under `~/.pi/agent/sessions/--<cwd>--/`. Simulators and local IDE state. Auth that exists only here. An isolated child cannot read the parent's local store, so its brief inlines what it needs or points at repo paths. Prefer fewer, broader workers. One writer per worktree or branch (principle-separate-before-serializing-shared-state). Run a unit's verifier on a different model family from its worker."
+		},
+		{
+			"file": "skills/poteto-mode/playbooks/orchestrate.md",
+			"old": "Size the brief to the unit. A one-command unit gets the template collapsed to a paragraph that still names goal, scope, the verify command, and the report shape. A 4KB scaffold around a two-line edit costs more to write and obey than the edit. Local spawns may reference the standing-orders file by store path. Verbatim paste is for cloud spawns and every resume.",
+			"new": "Size the brief to the unit. A one-command unit gets the template collapsed to a paragraph that still names goal, scope, the verify command, and the report shape. A 4KB scaffold around a two-line edit costs more to write and obey than the edit. Local spawns may reference the standing-orders file by store path. Verbatim paste is for every isolated spawn and every resume."
+		},
+		{
+			"file": "skills/poteto-mode/playbooks/orchestrate.md",
+			"old": "A sub-coordinator brief adds its track boundary and unit list, its spawn budget with the cloud default and the local exception list, the drain protocol, and the rollup format (per child: name, status, PR, head SHA, verdict, one line, plus track status and frontier delta).",
+			"new": "A sub-coordinator brief adds its track boundary and unit list, its spawn budget with the worktree default and the local exception list, the drain protocol, and the rollup format (per child: name, status, PR, head SHA, verdict, one line, plus track status and frontier delta)."
+		},
+		{
+			"file": "skills/poteto-mode/playbooks/orchestrate.md",
+			"old": "- Exactly one stacker per stack may run `gt`, serialized within its stack. Record the holder in the standing orders. Restacks run in cloud. A local restack at this scale takes the laptop down.",
+			"new": "- Exactly one stacker per stack may run `gt`, serialized within its stack. Record the holder in the standing orders. Restacks run in a dedicated worktree. A restack in the main checkout at this scale takes the laptop down."
+		},
+		{
+			"file": "skills/poteto-mode/playbooks/orchestrate.md",
+			"old": "- Never resume an agent to check on it. A resume restarts an idle agent. Probe read-only: the ledger, `units.tsv`, `gh`, pushed branches, the cloud agent's status in the Cursor dashboard. Transcript mtime is not liveness.",
+			"new": "- Never resume an agent to check on it. A resume restarts an idle agent. Probe read-only: the ledger, `units.tsv`, `gh`, pushed branches, the child's run status from the `subagent` status view. Transcript mtime is not liveness."
+		},
+		{
+			"file": "skills/poteto-mode/playbooks/orchestrate.md",
+			"old": "- After a Cursor restart: local agents are dead, cloud work is not. Re-read the standing orders and `units.tsv`, recompute the frontier, reattach cloud work by PR and branch rather than agent id, respawn one sub-coordinator per track from its stored brief plus current state, drain, resume. The dead session's store lock clears itself on the next write. `orch` replaces a lock whose holder pid is gone.",
+			"new": "- After a host restart: every child is dead, but the work recorded in branches and PRs is not. Re-read the standing orders and `units.tsv`, recompute the frontier, reattach by PR and branch rather than agent id, respawn one sub-coordinator per track from its stored brief plus current state, drain, resume. The dead session's store lock clears itself on the next write. `orch` replaces a lock whose holder pid is gone."
+		},
+		{
+			"file": "skills/poteto-mode/playbooks/session-pickup.md",
+			"old": "1. Locate the prior trail. A local transcript under the active workspace's `agent-transcripts/` directory (the system prompt names the path. Do not glob across `~/.pi/agent/sessions/`, that crosses workspace boundaries and reads private chats from unrelated projects), a cloud-agent URL, or a pushed branch. Read the metadata overview and last messages first, then scan back for the decision points. Parse a long transcript in a subagent and keep the reduced timeline in the main thread (the **principle-guard-the-context-window** skill).",
+			"new": "1. Locate the prior trail. A local transcript from `$PI_SESSION_FILE`, or from `~/.pi/agent/sessions/--<cwd>--/` (do not glob across other workspace directories under `~/.pi/agent/sessions/`, that crosses workspace boundaries and reads private chats from unrelated projects), an async run record, or a pushed branch. Read the metadata overview and last messages first, then scan back for the decision points. Parse a long transcript in a subagent and keep the reduced timeline in the main thread (the **principle-guard-the-context-window** skill)."
+		},
+		{
+			"file": "skills/poteto-mode/playbooks/shipping.md",
+			"old": "1. **Resolve the forge, then verify every PR independently.** GitHub CLI (`gh`) is the default. If `command -v origin` succeeds and Origin can resolve the repository, use `origin pr ...` for PR view, watch, edit, and merge operations. Otherwise stay on `gh` and record the fallback. Never require Graphite (`gt`). One subagent per PR, not batched, each a Cursor cloud agent, each exercising the real surface (the project's verification skill or harness from the project's verification skill as the change demands) against parent versus head. Each returns `PASS`, `PASS+NOTES` or `FAIL` and posts that verdict on its own PR. Safe means a verdict from an agent that did not write the code. CI green is not a verdict, and an approving bot review is not a verdict.",
+			"new": "1. **Resolve the forge, then verify every PR independently.** GitHub CLI (`gh`) is the default. If `command -v origin` succeeds and Origin can resolve the repository, use `origin pr ...` for PR view, watch, edit, and merge operations. Otherwise stay on `gh` and record the fallback. Never require Graphite (`gt`). One subagent per PR, not batched, each an owner subagent, each exercising the real surface (the project's verification skill or harness from the project's verification skill as the change demands) against parent versus head. Each returns `PASS`, `PASS+NOTES` or `FAIL` and posts that verdict on its own PR. Safe means a verdict from an agent that did not write the code. CI green is not a verdict, and an approving bot review is not a verdict."
+		},
+		{
+			"file": "skills/poteto-mode/playbooks/worktree-cleanup.md",
+			"old": "1. Snapshot and audit. Record `df -h /`, then run `scripts/worktree-audit.sh` (principle-build-the-lever). It reads paths from `git worktree list`, never hand-typed, since a hand-typed `myrepo-worktrees/x` misses one that lives at `.cursor/worktrees/myrepo/x` (principle-encode-lessons-in-structure). It classifies each worktree by size, age, merge state, uncommitted work, PR state, and the newest chat that touched it, then suggests a bucket. The transcript scan is slow, so background it.",
+			"new": "1. Snapshot and audit. Record `df -h /`, then run `scripts/worktree-audit.sh` (principle-build-the-lever). It reads paths from `git worktree list`, never hand-typed, since a hand-typed `myrepo-worktrees/x` misses one that lives at the managed worktree root (`{dirname(repoRoot)}/worktrees/myrepo/x`, or `subagents.worktreeBaseDir`) (principle-encode-lessons-in-structure). It classifies each worktree by size, age, merge state, uncommitted work, PR state, and the newest chat that touched it, then suggests a bucket. The transcript scan is slow, so background it."
+		},
+		{
+			"file": "skills/poteto-mode/references/review-triage.md",
+			"old": "# Bugbot triage",
+			"new": "# Review-automation triage"
+		},
+		{
+			"file": "skills/poteto-mode/references/review-triage.md",
+			"old": "Use this reference when the Babysit playbook (`../playbooks/babysit.md`) handles Bugbot or review-automation comments. The goal is not to ignore Bugbot by default. The goal is to stop treating every comment as a required code change.",
+			"new": "Use this reference when the Babysit playbook (`../playbooks/babysit.md`) handles review-automation comments. The goal is not to ignore review automation by default. The goal is to stop treating every comment as a required code change."
+		},
+		{
+			"file": "skills/poteto-mode/references/review-triage.md",
+			"old": "Classify each Bugbot thread before acting:",
+			"new": "Classify each review-automation thread before acting:"
+		},
+		{
+			"file": "skills/poteto-mode/references/review-triage.md",
+			"old": "- Skip when: The PR description, screenshots, design review, or nearby code makes the visual change explicit, and the Bugbot comment is only restating that a shared visual default changed.",
+			"new": "- Skip when: The PR description, screenshots, design review, or nearby code makes the visual change explicit, and the automation comment is only restating that a shared visual default changed."
+		},
+		{
+			"file": "skills/poteto-mode/references/review-triage.md",
+			"old": "### Upstack or stack-local usage Bugbot cannot see",
+			"new": "### Upstack or stack-local usage a review automation cannot see"
+		},
+		{
+			"file": "skills/poteto-mode/references/review-triage.md",
+			"old": "- Skip when: Bugbot flags an export, component, helper, or file as unused, and the active forge's PR list and diffs, upper-stack diffs, or PR context show it is used by a later PR in the stack.",
+			"new": "- Skip when: A review automation flags an export, component, helper, or file as unused, and the active forge's PR list and diffs, upper-stack diffs, or PR context show it is used by a later PR in the stack."
+		},
+		{
+			"file": "skills/poteto-mode/references/review-triage.md",
+			"old": "- Skip when: The comment body or a later Bugbot reply explicitly says the finding is withdrawn, compliant, or a false positive, and the agent can verify the relevant rule locally.",
+			"new": "- Skip when: The comment body or a later review-automation reply explicitly says the finding is withdrawn, compliant, or a false positive, and the agent can verify the relevant rule locally."
+		},
+		{
+			"file": "skills/poteto-mode/references/review-triage.md",
+			"old": "- Skip when: Practically never. When a diff replaces native browser behavior with a manual equivalent (native sticky → JS-positioned clones, native scroll targeting → forwarded wheel/touch events, paint-order occlusion → masks/clip-path), Bugbot's logic-bug findings against that code have been consistently legitimate.",
+			"new": "- Skip when: Practically never. When a diff replaces native browser behavior with a manual equivalent (native sticky → JS-positioned clones, native scroll targeting → forwarded wheel/touch events, paint-order occlusion → masks/clip-path), the automation's logic-bug findings against that code have been consistently legitimate."
+		},
+		{
+			"file": "skills/poteto-mode/references/review-triage.md",
+			"old": "- Source: one sticky-occlusion PR: six Bugbot passes, roughly eighteen findings, every one fixed rather than dismissed.",
+			"new": "- Source: one sticky-occlusion PR: six review-automation passes, roughly eighteen findings, every one fixed rather than dismissed."
+		},
+		{
+			"file": "skills/poteto-mode/references/review-triage.md",
+			"old": "  a SKILL.md, snapshot of doc wording), and Bugbot claims \"the test no longer",
+			"new": "  a SKILL.md, snapshot of doc wording), and a review automation claims \"the test no longer"
+		},
+		{
+			"file": "skills/poteto-mode/references/review-triage.md",
+			"old": "- Source: one prose-pinning PR with eight Bugbot passes; the claim was real on",
+			"new": "- Source: one prose-pinning PR with eight review-automation passes; the claim was real on"
+		},
+		{
+			"file": "skills/poteto-mode/SKILL.md",
+			"old": "- Bugbot or the agentic security review commented → skeptical posture. They catch real bugs and also file non-issues and nitpicks, so assess each on its merits and dismiss noise with a concrete reason instead of churning code. Triage fix / dismiss / ask per `references/bugbot-triage.md`.",
+			"new": "- A review automation or the agentic security review commented → skeptical posture. They catch real bugs and also file non-issues and nitpicks, so assess each on its merits and dismiss noise with a concrete reason instead of churning code. Triage fix / dismiss / ask per `references/review-triage.md`."
+		},
+		{
+			"file": "skills/poteto-mode/SKILL.md",
+			"old": "**Defaults for every `subagent()` launch.** `run_in_background: true`, agent mode (readonly strips MCP), file pointers not inlined context, explicit model per role (configurable via `/setup-pstack`. Defaults inherit-parent for code, inherit-parent for prose and judgment). Code delegates tier by difficulty. The hardest changes (cross-cutting design, gnarly concurrency, subtle algorithms) go to your strongest judgment model (inherit-parent), whether the task needs judgment on vague intent or is a precisely specified sequence of steps to execute to the letter. Trivial mechanical edits go to your fast code model. Per-role lines in the injected pstack role table override these defaults and the model choices in the routed skills (`how`, `why`, `arena`, `swarm`, `architect`, `interrogate`, `reflect`). A role with no line keeps its default, and a role line of `inherit-parent` or `auto` runs that role on the parent chat model (omit Task `model`).",
+			"new": "**Defaults for every `subagent()` launch.** `async: true`, file pointers not inlined context, a read-only child when the work must not write (an agent whose `tools` exclude `edit` and `write`, such as `reviewer`), and MCP access per child (`mcp:<server>` in the child's tools when it needs one). Explicit model per role (configurable via `/setup-pstack`. Defaults inherit-parent for code, inherit-parent for prose and judgment). Code delegates tier by difficulty. The hardest changes (cross-cutting design, gnarly concurrency, subtle algorithms) go to your strongest judgment model (inherit-parent), whether the task needs judgment on vague intent or is a precisely specified sequence of steps to execute to the letter. Trivial mechanical edits go to your fast code model. Per-role lines in the injected pstack role table override these defaults and the model choices in the routed skills (`how`, `why`, `arena`, `swarm`, `architect`, `interrogate`, `reflect`). A role with no line keeps its default, and a role line of `inherit-parent` or `auto` runs that role on the parent chat model (omit `model`)."
+		},
+		{
+			"file": "skills/poteto-mode/SKILL.md",
+			"old": "Open a todolist whose first items are the matched playbook's steps, copied in verbatim, before any task-specific todos. A step you choose not to do stays in the list with a one-line `skip: <reason>`. Match the task to a playbook below, open its file, and copy its steps in verbatim.",
+			"new": "Open the `todo` list whose first items are the matched playbook's steps, copied in verbatim, before any task-specific todos. A step you choose not to do stays in the list with a one-line `skip: <reason>`. Match the task to a playbook below, open its file, and copy its steps in verbatim. Keep the list with the `todo` tool from `@juicesharp/rpiv-todo`; if it is unavailable, keep the same list in `TODO.md` at the repo root."
+		},
+		{
+			"file": "skills/reflect/references/divergent-reviewer.md",
+			"old": "- `Task` prompts that name a skill path",
+			"new": "- `subagent` prompts that name a skill path"
+		},
+		{
+			"file": "skills/reflect/references/judgment-reviewer.md",
+			"old": "- `Task` prompts that name a skill path",
+			"new": "- `subagent` prompts that name a skill path"
+		},
+		{
+			"file": "skills/reflect/references/synthesizer.md",
+			"old": "- \"Bugbot flagged regex backtracking on May 2\"",
+			"new": "- \"An automation flagged regex backtracking on May 2\""
+		},
+		{
+			"file": "skills/reflect/references/tooling-reviewer.md",
+			"old": "- `Task` prompts that name a skill path",
+			"new": "- `subagent` prompts that name a skill path"
+		},
+		{
+			"file": "skills/reflect/SKILL.md",
+			"old": "The parent finds its own transcript file before fanning out. The system prompt names the active workspace's `agent-transcripts/` directory. Use that path. Do not glob across `~/.pi/agent/sessions/`. That crosses workspace boundaries and reads private chats from unrelated projects.",
+			"new": "The parent finds its own transcript file before fanning out. Use `$PI_SESSION_FILE`, or the newest file under `~/.pi/agent/sessions/--<cwd>--/`. Do not glob across other workspace directories under `~/.pi/agent/sessions/`. That crosses workspace boundaries and reads private chats from unrelated projects."
+		},
+		{
+			"file": "skills/reflect/SKILL.md",
+			"old": "ls -t <agent-transcripts>/*.jsonl <agent-transcripts>/*/*.jsonl <agent-transcripts>/*/subagents/*.jsonl 2>/dev/null | head -10",
+			"new": "ls -t \"$PI_SESSION_FILE\" ~/.pi/agent/sessions/--<cwd>--/*.jsonl 2>/dev/null | head -10"
+		},
+		{
+			"file": "skills/reflect/SKILL.md",
+			"old": "Pass each template verbatim, substituting the transcript path or digest where marked. Reviewers return findings in the `Task` response body.",
+			"new": "Pass each template verbatim, substituting the transcript path or digest where marked. Reviewers return findings in the subagent response body."
+		},
+		{
+			"file": "skills/show-me-your-work/SKILL.md",
+			"old": "At the end of the run, before handing back, check the log told the truth. Read this run's transcript under the active workspace's `agent-transcripts/` directory (the system prompt names the path). Don't glob across `~/.pi/agent/sessions/`. That reads unrelated private chats. Walk the log against what actually happened:",
+			"new": "At the end of the run, before handing back, check the log told the truth. Read this run's transcript from `$PI_SESSION_FILE`, or the newest file under `~/.pi/agent/sessions/--<cwd>--/`. Don't glob across other workspace directories under `~/.pi/agent/sessions/`. That reads unrelated private chats. Walk the log against what actually happened:"
+		},
+		{
+			"file": "skills/swarm/SKILL.md",
+			"old": "Fan out N parallel cloud workers. They may cover separate slices, race the same brief, or mix both. The parent waits, aggregates, and returns one report.",
+			"new": "Fan out N parallel workers, each in its own worktree. They may cover separate slices, race the same brief, or mix both. The parent waits, aggregates, and returns one report."
+		},
+		{
+			"file": "skills/swarm/SKILL.md",
+			"old": "Open a todolist with one entry per phase before launching anything.",
+			"new": "Open the `todo` list with one entry per phase before launching anything."
+		},
+		{
+			"file": "skills/swarm/SKILL.md",
+			"old": "3. Set N from the user or derive it from the shape. N is total workers, not the cloud concurrency limit.",
+			"new": "3. Set N from the user or derive it from the shape. N is total workers, not the host's concurrency limit."
+		},
+		{
+			"file": "skills/swarm/SKILL.md",
+			"old": "Spawn all N workers in one message with `agent: \"worker\", `environment: \"cloud\"`, `run_in_background: true`, and the configured model. Use `environment: \"local\"` only when the worker needs access to something on the user's computer.",
+			"new": "Spawn all N workers in one message with `subagent({ agent: \"worker\", task, worktree: true, async: true, model })`. Omit `worktree: true` only when the worker needs access to something on the user's computer."
+		},
+		{
+			"file": "skills/swarm/SKILL.md",
+			"old": "When a worker must start from a non-default pushed branch, pass `cloud_base_branch`.",
+			"new": "When a worker must start from a non-default pushed branch, pass `baseRef`."
+		},
+		{
+			"file": "skills/why/SKILL.md",
+			"old": "Before spawning investigators, list the available MCPs from the Cursor environment. Use the available-tools map when present. Otherwise inspect the `mcps/` directory Cursor exposes for enabled MCP servers.",
+			"new": "Before spawning investigators, list the MCP tools the session exposes. Use the available-tools map when present. Otherwise read `~/.pi/agent/mcp.json` and the MCP tools the running session provides."
+		}
+	],
+	"renames": [
+		{
+			"from": "skills/poteto-mode/references/bugbot-triage.md",
+			"to": "skills/poteto-mode/references/review-triage.md"
+		}
+	]
+}

@@ -58,7 +58,7 @@ Capture this as seed context (file paths, symbols, commits, PR numbers, linked t
 
 ### Discovery
 
-Before spawning investigators, list the available MCPs from the Cursor environment. Use the available-tools map when present. Otherwise inspect the `mcps/` directory Cursor exposes for enabled MCP servers.
+Before spawning investigators, list the MCP tools the session exposes. Use the available-tools map when present. Otherwise read `~/.pi/agent/mcp.json` and the MCP tools the running session provides.
 
 Map each available MCP to one evidence category:
 

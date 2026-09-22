@@ -16,10 +16,10 @@ Invoke when the user says "reflect" or "/skill:reflect". Skip when the conversat
 
 ### 1. Locate the active transcript
 
-The parent finds its own transcript file before fanning out. The system prompt names the active workspace's `agent-transcripts/` directory. Use that path. Do not glob across `~/.pi/agent/sessions/`. That crosses workspace boundaries and reads private chats from unrelated projects.
+The parent finds its own transcript file before fanning out. Use `$PI_SESSION_FILE`, or the newest file under `~/.pi/agent/sessions/--<cwd>--/`. Do not glob across other workspace directories under `~/.pi/agent/sessions/`. That crosses workspace boundaries and reads private chats from unrelated projects.
 
 ```bash
-ls -t <agent-transcripts>/*.jsonl <agent-transcripts>/*/*.jsonl <agent-transcripts>/*/subagents/*.jsonl 2>/dev/null | head -10
+ls -t "$PI_SESSION_FILE" ~/.pi/agent/sessions/--<cwd>--/*.jsonl 2>/dev/null | head -10
 ```
 
 Three transcript layouts: legacy flat (`<id>.jsonl`), current nested (`<id>/<id>.jsonl`), and subagent (`<parent>/subagents/<child>.jsonl`).
@@ -36,7 +36,7 @@ One message, three `subagent()` launches, `agent: "worker", explicit `model:` on
 | Tooling | your configured reflect-tooling model (default inherit-parent) | `references/tooling-reviewer.md` |
 | Divergent | your configured reflect-judgment model (default inherit-parent) | `references/divergent-reviewer.md` |
 
-Pass each template verbatim, substituting the transcript path or digest where marked. Reviewers return findings in the `Task` response body.
+Pass each template verbatim, substituting the transcript path or digest where marked. Reviewers return findings in the subagent response body.
 
 ### 3. Synthesize
 

@@ -1,4 +1,11 @@
-# @zenspc/pi-pstack
+# @azzz9/pi-pstack
+
+Personal pi fork of [`@zenspc/pi-pstack`](https://www.npmjs.com/package/@zenspc/pi-pstack).
+See [FORK.md](FORK.md) for what this fork changes, the required
+`@juicesharp/rpiv-todo` and `@juicesharp/rpiv-ask-user-question` plugins, and how to sync with
+Cursor upstream.
+
+The rest of this file is the upstream README, unchanged.
 
 pstack for Pi: rigorous agent workflows you can parallelize with confidence. Ported from the Cursor pstack plugin.
 

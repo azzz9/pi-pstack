@@ -1,19 +1,18 @@
 {
-	"name": "@zenspc/pi-pstack",
+	"name": "@azzz9/pi-pstack",
 	"version": "0.6.0",
-	"description": "pstack for Pi: rigorous agent workflows you can parallelize with confidence - poteto-mode playbooks, engineering principles, multi-model review panels, and subagents.",
+	"description": "pstack for Pi (personal fork of @zenspc/pi-pstack): poteto-mode playbooks, principles, review panels, and subagents.",
 	"type": "module",
 	"license": "MIT",
 	"author": "dhairyaar",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/zenspc/pi-extensions.git",
-		"directory": "packages/pi-pstack"
+		"url": "git+https://github.com/azzz9/pi-pstack.git"
 	},
 	"bugs": {
-		"url": "https://github.com/zenspc/pi-extensions/issues"
+		"url": "https://github.com/azzz9/pi-pstack/issues"
 	},
-	"homepage": "https://github.com/zenspc/pi-extensions/tree/master/packages/pi-pstack#readme",
+	"homepage": "https://github.com/azzz9/pi-pstack#readme",
 	"publishConfig": {
 		"access": "public"
 	},
@@ -33,7 +32,9 @@
 		"skills/",
 		"agents/",
 		"README.md",
-		"LICENSE"
+		"LICENSE",
+		"FORK.md",
+		"scripts/"
 	],
 	"peerDependencies": {
 		"@earendil-works/pi-coding-agent": "*"
@@ -52,6 +53,7 @@
 		}
 	},
 	"scripts": {
-		"test": "node --experimental-strip-types --test extensions/pstack/*.test.ts skills/poteto-mode/scripts/check-plan.test.mjs scripts/reground-from-cursor.test.mjs"
+		"test": "node --experimental-strip-types --test extensions/pstack/*.test.ts skills/poteto-mode/scripts/check-plan.test.mjs scripts/reground-from-cursor.test.mjs",
+		"reground": "node --experimental-strip-types scripts/reground-from-cursor.mjs"
 	}
 }

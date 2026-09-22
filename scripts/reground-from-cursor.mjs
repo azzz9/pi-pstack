@@ -5,11 +5,18 @@ import {
 	mkdirSync,
 	readdirSync,
 	readFileSync,
+	renameSync,
 	unlinkSync,
 	writeFileSync,
 } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+
+// Local harness fixes for pi, applied after every reground so an upstream sync
+// cannot reintroduce Cursor-only references. See FORK.md.
+export const PI_HARNESS_FIXES = JSON.parse(
+	readFileSync(new URL("./pi-harness-fixes.json", import.meta.url), "utf8"),
+);
 
 export const DISCOVERABLE = ["how", "typescript-best-practices", "unslop", "why"];
 
@@ -710,6 +717,47 @@ export function apply(planned) {
 			applyDerivedPatch(action.derived, planned.paths.to, planned.counts);
 		}
 	}
+	applyPiHarnessFixes(planned.paths.to);
+}
+
+export function applyPiHarnessFixes(destRoot) {
+	let applied = 0;
+	let already = 0;
+	const failures = [];
+	for (const rename of PI_HARNESS_FIXES.renames) {
+		const from = join(destRoot, rename.from);
+		const to = join(destRoot, rename.to);
+		if (existsSync(from)) {
+			renameSync(from, to);
+			applied++;
+		} else if (existsSync(to)) {
+			already++;
+		} else {
+			failures.push(`${rename.from}: neither the source nor the target exists`);
+		}
+	}
+	for (const rule of PI_HARNESS_FIXES.rules) {
+		const dest = join(destRoot, rule.file);
+		if (!existsSync(dest)) {
+			failures.push(`${rule.file}: missing`);
+			continue;
+		}
+		const text = readFileSync(dest, "utf8");
+		const oldCount = text.split(rule.old).length - 1;
+		const newCount = text.split(rule.new).length - 1;
+		if (oldCount === 1) {
+			writeIfChanged(dest, text.replace(rule.old, rule.new));
+			applied++;
+		} else if (oldCount === 0 && newCount >= 1) {
+			already++;
+		} else {
+			failures.push(`${rule.file}: old=${oldCount} new=${newCount} for ${JSON.stringify(rule.old.slice(0, 70))}`);
+		}
+	}
+	if (failures.length > 0) {
+		throw new Error(`pi harness fixes failed:\n${failures.join("\n")}`);
+	}
+	return { applied, already };
 }
 
 export function assertNoCursorSeams(destRoot) {
@@ -729,6 +777,20 @@ export function assertNoCursorSeams(destRoot) {
 		if (text.includes("Task subagent")) leftover.push(`${rel}: Task subagent`);
 		if (text.includes("$HOME/.cursor")) leftover.push(`${rel}: $HOME/.cursor`);
 		if (text.includes("@cursor-skill")) leftover.push(`${rel}: @cursor-skill`);
+		if (rel.endsWith(".md")) {
+			for (const token of [
+				"agent-transcripts",
+				"run_in_background",
+				'environment: "cloud"',
+				"cloud-sleeper",
+				"cloud_base_branch",
+				"Bugbot",
+				"todolist",
+				"`Task`",
+			]) {
+				if (text.includes(token)) leftover.push(`${rel}: ${token}`);
+			}
+		}
 		if (/from \./.test(text)) leftover.push(`${rel}: from .`);
 		const parts = rel.split("/");
 		if (parts[parts.length - 1] !== "SKILL.md") continue;

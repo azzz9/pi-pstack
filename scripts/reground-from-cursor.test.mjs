@@ -1,12 +1,42 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { asRelPath, classify, plan } from "./reground-from-cursor.mjs";
+import { PI_HARNESS_FIXES, applyPiHarnessFixes, asRelPath, classify, plan } from "./reground-from-cursor.mjs";
 
-const FROM = "/home/reyori/Projects/common-workspace/cursor-plugins/pstack";
+const FROM = process.env.CURSOR_PSTACK_DIR ?? "/home/reyori/Projects/common-workspace/cursor-plugins/pstack";
 const TO = join(dirname(fileURLToPath(import.meta.url)), "..");
+
+test("pi harness fixes rewrite upstream text and rename the triage reference", () => {
+	const dir = mkdtempSync(join(tmpdir(), "pi-harness-"));
+	const byFile = new Map();
+	for (const rule of PI_HARNESS_FIXES.rules) {
+		if (!byFile.has(rule.file)) byFile.set(rule.file, []);
+		byFile.get(rule.file).push(rule);
+	}
+	for (const rename of PI_HARNESS_FIXES.renames) {
+		const rules = byFile.get(rename.to) ?? [];
+		mkdirSync(dirname(join(dir, rename.from)), { recursive: true });
+		writeFileSync(join(dir, rename.from), `${rules.map((rule) => rule.old).join("\n")}\n`);
+		byFile.delete(rename.to);
+	}
+	for (const [rel, rules] of byFile) {
+		mkdirSync(dirname(join(dir, rel)), { recursive: true });
+		writeFileSync(join(dir, rel), `${rules.map((rule) => rule.old).join("\n")}\n`);
+	}
+	applyPiHarnessFixes(dir);
+	for (const rename of PI_HARNESS_FIXES.renames) {
+		assert.ok(!existsSync(join(dir, rename.from)), `${rename.from} should be renamed away`);
+		assert.ok(existsSync(join(dir, rename.to)), `${rename.to} should exist`);
+	}
+	for (const rule of PI_HARNESS_FIXES.rules) {
+		const rel = PI_HARNESS_FIXES.renames.find((rename) => rename.to === rule.file)?.to ?? rule.file;
+		const text = readFileSync(join(dir, rel), "utf8");
+		assert.ok(text.includes(rule.new), `${rel}: missing ${rule.new.slice(0, 60)}`);
+	}
+});
 
 test("asRelPath rejects traversal and absolute paths", () => {
 	assert.throws(() => asRelPath(".."));
@@ -27,7 +57,7 @@ test("classify live trees", () => {
 	assert.equal(classify(asRelPath("skills/poteto-mode/scripts/worktree-audit.sh")), "pi-only");
 });
 
-test("plan dry-run shape against live trees", () => {
+test("plan dry-run shape against live trees", { skip: existsSync(FROM) ? false : `set CURSOR_PSTACK_DIR to a cursor/plugins pstack checkout` }, () => {
 	const planned = plan({ from: FROM, to: TO, dryRun: true });
 	const writes = planned.actions.filter((action) => action.kind === "write");
 	const deletes = planned.actions.filter((action) => action.kind === "delete");
