@@ -468,9 +468,10 @@ function needsDropHowCritics(to) {
 }
 
 const POTETO_INTRO = [
-	"`/poteto-mode` enables this mode for the rest of the session.",
-	"`/poteto-mode off` disables it.",
-	"`/skill:poteto-mode` also enables it.",
+	"Poteto Mode is on when a session starts.",
+	"`/poteto-mode` turns it on for the rest of the session.",
+	"`/poteto-mode off` turns it off for the rest of that session only; the next session starts with it on.",
+	"`/skill:poteto-mode` also turns it on.",
 	"The role table is injected from `~/.pi/agent/pstack/models.json` only when a role has a real model slug.",
 	"",
 	"",
@@ -480,7 +481,7 @@ const SUBAGENT_DEFAULTS =
 	"**Defaults for every `subagent()` launch.** file pointers not inlined context. The default for every role is the parent session model (`inherit-parent`; omit `model`). `/setup-pstack` writes `~/.pi/agent/pstack/models.json` and overrides per role. Pass a configured real slug as `model:`. `inherit-parent` and `auto` mean omit `model`. Code delegates tier by difficulty. The hardest changes (cross-cutting design, gnarly concurrency, subtle algorithms) go to the model configured for `hardest tasks`, else the parent model, when the task needs judgment or the intent is vague, and to your strongest instruction-following model when the work is a precisely specified sequence of steps to execute to the letter; trivial mechanical edits go to your fast code model. Per-role lines in the injected pstack role table override these defaults and the model choices in the routed skills (`how`, `why`, `arena`, `swarm`, `architect`, `interrogate`, `reflect`); a role with no line keeps its default.";
 
 function patchPotetoModePi(text) {
-	if (!text.includes("`/poteto-mode` enables this mode")) {
+	if (!text.includes("Poteto Mode is on when a session starts.")) {
 		text = text.replace("# Poteto mode\n\n", `# Poteto mode\n\n${POTETO_INTRO}`);
 	}
 	text = text.replace(/\*\*Defaults for every `Task` call\.\*\*[^\n]*/, SUBAGENT_DEFAULTS);

@@ -22,6 +22,9 @@ Fixes beyond upstream 0.6.0:
   exclude `edit` and `write`.
 - The Cursor cloud-agent concepts are gone. Owners, roots, and verifiers run locally.
 - The todo list names the `todo` tool from `@juicesharp/rpiv-todo`.
+- Poteto Mode is on when a session starts, so it needs no manual `/poteto-mode`. `/poteto-mode off`
+  turns it off for the rest of that session only, and the next session starts with it on. Upstream
+  starts every session with the mode off.
 - `Bugbot` wording becomes generic review-automation wording, and
   `references/bugbot-triage.md` is renamed to `references/review-triage.md`.
 - The reground tool refuses to finish if any of those tokens survive a sync.

@@ -6,9 +6,10 @@ disable-model-invocation: true
 
 # Poteto mode
 
-`/poteto-mode` enables this mode for the rest of the session.
-`/poteto-mode off` disables it.
-`/skill:poteto-mode` also enables it.
+Poteto Mode is on when a session starts.
+`/poteto-mode` turns it on for the rest of the session.
+`/poteto-mode off` turns it off for the rest of that session only; the next session starts with it on.
+`/skill:poteto-mode` also turns it on.
 The role table is injected from `~/.pi/agent/pstack/models.json` only when a role has a real model slug.
 
 ## Non-negotiables

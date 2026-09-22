@@ -32,7 +32,9 @@ export function systemPromptInjection(config: PstackConfig, potetoMode: boolean)
 	return parts.join("\n\n");
 }
 
-type ModeEntry = {
+const POTETO_MODE_DEFAULT = true;
+
+export type ModeEntry = {
 	type?: string;
 	customType?: string;
 	data?: { enabled?: unknown };
@@ -46,14 +48,20 @@ function sessionEntries(ctx: ExtensionContext): ModeEntry[] {
 	return typeof sm.getBranch === "function" ? sm.getBranch() : sm.getEntries();
 }
 
-function lastPotetoEnabled(entries: ModeEntry[]): boolean {
-	let enabled = false;
+function lastPotetoEnabled(entries: ModeEntry[]): boolean | undefined {
+	let enabled: boolean | undefined;
 	for (const entry of entries) {
 		if (entry.type === "custom" && entry.customType === "pstack-mode") {
 			enabled = Boolean(entry.data?.enabled);
 		}
 	}
 	return enabled;
+}
+
+// Poteto Mode is on from the first turn. `/poteto-mode off` records off in this
+// session's entries, so it wins here and lasts only as long as the session does.
+export function sessionPotetoMode(entries: ModeEntry[]): boolean {
+	return lastPotetoEnabled(entries) ?? POTETO_MODE_DEFAULT;
 }
 
 function stripCurrentMark(choice: string): string {
@@ -100,8 +108,7 @@ export default function pstackExtension(pi: ExtensionAPI): void {
 	}
 
 	pi.on("session_start", async (_event, ctx) => {
-		potetoMode = false;
-		potetoMode = lastPotetoEnabled(sessionEntries(ctx));
+		potetoMode = sessionPotetoMode(sessionEntries(ctx));
 		setStatus(ctx);
 		try {
 			migrateLegacyMarkdownIfNeeded();
@@ -129,7 +136,8 @@ export default function pstackExtension(pi: ExtensionAPI): void {
 	});
 
 	pi.registerCommand("poteto-mode", {
-		description: "Enable or disable sticky pstack Poteto Mode. Usage: /poteto-mode [task] | /poteto-mode off",
+		description:
+			"Toggle pstack Poteto Mode for this session. Usage: /poteto-mode [task] | /poteto-mode off",
 		getArgumentCompletions: (prefix) => {
 			const token = prefix.trim().toLowerCase();
 			if (!token || "off".startsWith(token)) {
@@ -142,11 +150,11 @@ export default function pstackExtension(pi: ExtensionAPI): void {
 			const token = raw.split(/\s+/)[0]?.toLowerCase() ?? "";
 			if (token === "off" || token === "disable" || token === "stop") {
 				persistMode(false, ctx);
-				ctx.ui.notify("Poteto Mode off.", "info");
+				ctx.ui.notify("Poteto Mode off for this session. The next session starts with it on.", "info");
 				return;
 			}
 			persistMode(true, ctx);
-			ctx.ui.notify("Poteto Mode on. Stays on until /poteto-mode off.", "info");
+			ctx.ui.notify("Poteto Mode on for this session.", "info");
 			const payload = `${POTETO_SKILL}${raw ? ` ${raw}` : ""}`;
 			pi.sendUserMessage(
 				payload,

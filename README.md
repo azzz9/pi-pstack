@@ -22,7 +22,7 @@ Requires [`pi-subagents`](https://www.npmjs.com/package/pi-subagents) for the `p
 ## Get started
 
 1. Run `/setup-pstack` once to pick which models each role uses (optional; every role inherits the parent session model otherwise).
-2. Use `/poteto-mode` for sticky Poteto Mode. It stays on until `/poteto-mode off`. `/skill:poteto-mode` also enables it.
+2. Poteto Mode is on from the first turn of a session, so there is nothing to enable. `/poteto-mode off` turns it off for the rest of that session only; the next session starts with it on. `/poteto-mode <task>` and `/skill:poteto-mode` also turn it on.
 3. Run `/pstack off` to hide even the four Discoverable skills (`how`, `why`, `unslop`, `typescript-best-practices`) from the Skill catalog.
    Off persists in `~/.pi/agent/pstack/models.json`.
    `/skill:<name>` keeps working.
