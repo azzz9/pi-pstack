@@ -1,0 +1,83 @@
+name: Upstream drift
+
+# Diffs cursor/plugins' pstack against upstream.lock.json. `scripts/check-upstream.mjs` is the
+# single implementation; this workflow is only the unattended trigger. See FORK.md.
+
+on:
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: upstream-drift
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Compare against cursor/plugins
+        id: check
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set +e
+          node scripts/check-upstream.mjs > report.md
+          code=$?
+          set -e
+          cat report.md
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+
+      - name: Open or update the drift issue
+        if: steps.check.outputs.code == '1'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          {
+            cat report.md
+            echo
+            echo "_Filed by \`.github/workflows/upstream-drift.yml\` from [run ${GITHUB_RUN_ID}](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})._"
+          } > body.md
+          number=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open \
+            --search 'in:title "Upstream pstack moved"' --limit 1 --json number --jq '.[0].number // empty')
+          if [ -n "$number" ]; then
+            gh issue edit "$number" --repo "$GITHUB_REPOSITORY" --body-file body.md
+            gh issue comment "$number" --repo "$GITHUB_REPOSITORY" \
+              --body "Still behind as of [run ${GITHUB_RUN_ID}](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})."
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "Upstream pstack moved" --body-file body.md
+          fi
+
+      - name: Close the drift issue
+        if: steps.check.outputs.code == '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          number=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open \
+            --search 'in:title "Upstream pstack moved"' --limit 1 --json number --jq '.[0].number // empty')
+          if [ -n "$number" ]; then
+            gh issue comment "$number" --repo "$GITHUB_REPOSITORY" --body "upstream.lock.json now matches cursor/plugins."
+            gh issue close "$number" --repo "$GITHUB_REPOSITORY"
+          fi
+
+      - name: Fail when the check could not run
+        if: steps.check.outputs.code == '2' || steps.check.outputs.code == '3'
+        run: |
+          echo "::error::check-upstream exited ${{ steps.check.outputs.code }}. This is not a clean result."
+          exit 1
+
+      - name: Note an unbaselined lock
+        if: steps.check.outputs.code == '4'
+        run: echo "::warning::No Cursor sync point is recorded. Run scripts/reground-from-cursor.mjs to record one."
