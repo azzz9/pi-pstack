@@ -92,8 +92,16 @@ tell a moved upstream from a rate-limited probe.
 Schema 1 of the lock is a bootstrap. This fork's content came from `@zenspc/pi-pstack` 0.6.0,
 which synced Cursor pstack 0.15.0, and no Cursor commit was ever recorded for it, so
 `sourceCommit` is `null` until a reground writes a real one and the check reports `unbaselined`.
-`npm test` keeps the lock honest offline by asserting that its recorded version matches the newest
-`Sync Cursor pstack <version>` line in `CHANGELOG.md`.
+
+The recorded `version` is the upstream `plugin.json` value a reground reads, while `CHANGELOG.md`
+carries the port's own label. The two drift apart without either being wrong, because upstream
+bumps its version for changes the harness already normalizes, so `0.15.0` and `0.15.2` can name
+identical fork content. Read `version` as display metadata, and `sourceCommit` plus `syncedFiles`
+as the identity.
+
+`npm test` keeps the lock honest offline. It rehashes every `adapt` and `copy` file in the tree and
+compares the result with `syncedFiles`, so a hand-edited synced file, a file added to the synced
+region, or a lock bumped without a sync fails the suite with no network access.
 
 ## Syncing with Cursor upstream
 

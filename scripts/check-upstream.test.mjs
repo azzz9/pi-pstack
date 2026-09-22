@@ -12,7 +12,7 @@ import {
 	renderReport,
 	summarizeChanges,
 } from "./check-upstream.mjs";
-import { writeUpstreamLock } from "./reground-from-cursor.mjs";
+import { syncedDigest, writeUpstreamLock } from "./reground-from-cursor.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -213,18 +213,33 @@ test("the lock write is idempotent and records the checkout, not a clock", () =>
 	assert.equal(lock.upstream.repo, "cursor/plugins");
 	assert.equal(lock.upstream.ref, "main");
 	assert.equal(lock.upstream.path, "pstack");
+	assert.equal(lock.upstream.syncedFiles.count, 0);
+	assert.match(lock.upstream.syncedFiles.sha256, /^[0-9a-f]{64}$/);
 	assert.equal(Object.hasOwn(lock.upstream, "syncedAt"), false);
 	assert.match(text, /\n {0}\t/);
 });
 
-test("the committed lock version matches the newest CHANGELOG sync line", () => {
+test("the committed lock still matches the synced set in the tree", () => {
 	const lock = loadLock(join(ROOT, "upstream.lock.json"));
-	const changelog = readFileSync(join(ROOT, "CHANGELOG.md"), "utf8");
-	const match = /Sync Cursor pstack (\d+\.\d+\.\d+)/.exec(changelog);
-	assert.ok(match, "CHANGELOG.md should record the Cursor pstack version it synced");
-	assert.equal(
-		lock.upstream.version,
-		match[1],
-		"upstream.lock.json must record the version the fork's content actually came from",
-	);
+	const digest = syncedDigest(ROOT);
+	assert.ok(lock.upstream.syncedFiles, "upstream.lock.json should record the synced file set");
+	assert.equal(digest.count, lock.upstream.syncedFiles.count, "a synced file was added or removed outside a reground");
+	assert.equal(digest.sha256, lock.upstream.syncedFiles.sha256, "a synced file changed outside a reground");
+});
+
+test("the digest moves when a synced file changes and stays put on a fork-only edit", () => {
+	const dir = mkdtempSync(join(tmpdir(), "pi-digest-"));
+	mkdirSync(join(dir, "skills/why"), { recursive: true });
+	mkdirSync(join(dir, "skills/deslop"), { recursive: true });
+	mkdirSync(join(dir, "scripts"), { recursive: true });
+	writeFileSync(join(dir, "skills/why/SKILL.md"), "synced\n");
+	writeFileSync(join(dir, "skills/deslop/SKILL.md"), "pi-only\n");
+	writeFileSync(join(dir, "scripts/check-upstream.mjs"), "ignored\n");
+	const before = syncedDigest(dir);
+	assert.equal(before.count, 1);
+	writeFileSync(join(dir, "skills/deslop/SKILL.md"), "pi-only, edited\n");
+	writeFileSync(join(dir, "scripts/check-upstream.mjs"), "ignored, edited\n");
+	assert.deepEqual(syncedDigest(dir), before, "pi-only and unclassified files are not owned by a sync");
+	writeFileSync(join(dir, "skills/why/SKILL.md"), "edited\n");
+	assert.notEqual(syncedDigest(dir).sha256, before.sha256, "an edited synced file must move the digest");
 });

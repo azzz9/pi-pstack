@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import {
 	existsSync,
 	lstatSync,
@@ -466,7 +467,7 @@ export function readSourceIdentity(fromRoot) {
 	return { commit, version };
 }
 
-export function upstreamLockText(identity) {
+export function upstreamLockText(identity, syncedFiles) {
 	const lock = {
 		schema: 1,
 		upstream: {
@@ -475,16 +476,45 @@ export function upstreamLockText(identity) {
 			path: "pstack",
 			sourceCommit: identity.commit,
 			version: identity.version,
+			syncedFiles,
 		},
 	};
 	return `${JSON.stringify(lock, null, "\t")}\n`;
+}
+
+// A sync owns every adapt and copy file in the destination, so hashing that set
+// lets npm test prove offline that the tree still holds what the lock claims.
+// A hand-edited synced file, a file added to the synced region, or a lock bumped
+// without a sync all change the digest.
+export function syncedDigest(root) {
+	const lines = [];
+	for (const rel of walkFiles(root)) {
+		let fileClass;
+		try {
+			fileClass = classify(rel);
+		} catch {
+			// A path outside every classified region is not part of the sync.
+			continue;
+		}
+		if (fileClass !== "adapt" && fileClass !== "copy") continue;
+		const hash = createHash("sha256").update(readFileSync(join(root, rel))).digest("hex");
+		lines.push(`${hash}  ${rel}`);
+	}
+	lines.sort();
+	return {
+		count: lines.length,
+		sha256: createHash("sha256").update(`${lines.join("\n")}\n`).digest("hex"),
+	};
 }
 
 // Written only after a sync has fully applied and passed its seam assertion, so
 // the lock can never claim a sync that failed. No clock field: an unchanged
 // upstream must leave an unchanged file.
 export function writeUpstreamLock(destRoot, identity) {
-	return writeIfChanged(join(destRoot, LOCK_REL), upstreamLockText(identity));
+	return writeIfChanged(
+		join(destRoot, LOCK_REL),
+		upstreamLockText(identity, syncedDigest(destRoot)),
+	);
 }
 
 function needsCatalogCounts(to, counts) {
