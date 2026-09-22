@@ -4,8 +4,8 @@
 		"repo": "cursor/plugins",
 		"ref": "main",
 		"path": "pstack",
-		"sourceCommit": null,
-		"version": "0.15.0",
+		"sourceCommit": "53e579f1481697931fc44f5445171397cfa2b24b",
+		"version": "0.15.2",
 		"syncedFiles": {
 			"count": 116,
 			"sha256": "685b09934f32e8888a8bb07502e4e743e012ac9c9a7a95b8222cbc8b3d612009"
