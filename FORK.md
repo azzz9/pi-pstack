@@ -57,6 +57,44 @@ MIT. The chain of authorship is this.
 for a copy or a substantial portion. The `skills/` prose and the extension code are covered by
 the same license.
 
+## Detecting upstream drift
+
+`upstream.lock.json` records the Cursor checkout the tree was last regenerated from.
+`scripts/reground-from-cursor.mjs` writes that file after a sync has applied and passed its seam
+assertion, so the lock cannot claim a sync that failed.
+
+```bash
+npm run check-upstream            # human report; exit 1 when upstream moved
+npm run check-upstream -- --json  # same result as JSON, for a scheduler
+```
+
+`.github/workflows/upstream-drift.yml` runs that command weekly and on demand, opens one issue
+whose title is its identity, updates that issue while the drift lasts, and closes it in sync.
+Drift opens the issue; a check that could not run fails the job instead, so an unusable probe
+never files a false report.
+
+The check reads the newest commit that touched `pstack/` upstream, and the newest one reachable
+from the recorded `sourceCommit`, then compares those two. It does not compare repository HEAD,
+because `cursor/plugins` is a monorepo where other plugins commit constantly. `sourceCommit` is
+the whole-checkout commit, so a depth-1 sparse clone is enough to record it, and the pstack-scoped
+commit is derived the same way on both sides.
+
+On drift it lists the changed paths under `pstack/`, split by what a reground costs. `adapt` and
+`copy` files get rewritten, `unclassified` is a path the classifier has never seen, and `pi-only`
+plus `never-copy` are ignored. A path named by `scripts/pi-harness-fixes.json` is flagged with its
+rule count, since those are the rules a sync has to rewrite. When upstream reports 300 changed
+files the list is capped, and the report says so.
+
+Exit codes: `0` in sync, `1` upstream moved, `2` the check could not run, `3` upstream's `pstack/`
+is gone, `4` no sync point recorded yet. Drift and failure never share a code, so a scheduler can
+tell a moved upstream from a rate-limited probe.
+
+Schema 1 of the lock is a bootstrap. This fork's content came from `@zenspc/pi-pstack` 0.6.0,
+which synced Cursor pstack 0.15.0, and no Cursor commit was ever recorded for it, so
+`sourceCommit` is `null` until a reground writes a real one and the check reports `unbaselined`.
+`npm test` keeps the lock honest offline by asserting that its recorded version matches the newest
+`Sync Cursor pstack <version>` line in `CHANGELOG.md`.
+
 ## Syncing with Cursor upstream
 
 `scripts/reground-from-cursor.mjs` rewrites a Cursor checkout into this package and then applies
@@ -73,9 +111,14 @@ node --experimental-strip-types scripts/reground-from-cursor.mjs \
 npm test
 ```
 
-`npm test` runs the reground tests, the extension tests, and `check-plan.mjs`. The
-"plan dry-run shape" test needs a Cursor checkout and skips itself unless
+`npm test` runs the reground tests, the check-upstream tests, the extension tests, and
+`check-plan.mjs`. The "plan dry-run shape" test needs a Cursor checkout and skips itself unless
 `CURSOR_PSTACK_DIR` points at one.
+
+The reground ends by rewriting `upstream.lock.json` from that checkout and printing the sync
+point. A run that fails its seam assertion writes no lock, so the next `npm run check-upstream`
+still reports the drift. Read `--from` from a fresh clone: a stale checkout would record a sync
+point that the tree behind it never reached.
 
 To pull zenspc's own newer rules instead, diff this fork against their `packages/pi-pstack`
 before running the reground, and fold in whatever they changed.

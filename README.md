@@ -23,6 +23,10 @@ Pin a commit sha when the install has to be reproducible. A Home Manager generat
 package reconciles the pin on every activation and checks the clone back out, so an uncommitted edit
 to `~/.pi/agent/git/github.com/azzz9/pi-pstack` does not survive.
 
+To see whether Cursor's pstack moved past the version this tree was built from, run
+`npm run check-upstream`. It reads the committed `upstream.lock.json` and never writes it; a
+reground records the new sync point. [FORK.md](FORK.md) has the report layout and the exit codes.
+
 The port expects these alongside it:
 
 | Package | Why |
