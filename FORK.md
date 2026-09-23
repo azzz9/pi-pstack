@@ -25,6 +25,10 @@ Fixes beyond upstream 0.6.0:
 - Poteto Mode is on when a session starts, so it needs no manual `/poteto-mode`. `/poteto-mode off`
   turns it off for the rest of that session only, and the next session starts with it on. Upstream
   starts every session with the mode off.
+- Poteto Mode's skill body is injected once per context as a hidden custom message instead of a
+  per-turn one-liner in the system prompt. A marker in the context decides re-injection, so
+  compaction dropping the body brings it back. The form follows `ayghri/i-have-adhd`'s always-on
+  extension (MIT).
 - `Bugbot` wording becomes generic review-automation wording, and
   `references/bugbot-triage.md` is renamed to `references/review-triage.md`.
 - The reground tool refuses to finish if any of those tokens survive a sync.

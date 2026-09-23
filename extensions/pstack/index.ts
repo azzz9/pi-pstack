@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { ExtensionAPI, ExtensionCommandContext, ExtensionContext } from "@earendil-works/pi-coding-agent";
@@ -17,19 +17,38 @@ import {
 	saveConfig,
 } from "./config.ts";
 import { stripSkillsByLocationPrefix } from "./skill-strip.ts";
+import { contextMarkers, latestMarkerIsActive } from "./skill-context.ts";
 
 const SKILLS_DIR = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "skills");
 
-const POTETO_SKILL = "/skill:poteto-mode";
-const POTETO_PROMPT =
-	"New task? Playbook match or rigor needed -> apply /poteto-mode. Casual turn or user opts out -> don't.";
+const POTETO_SKILL_COMMAND = "/skill:poteto-mode";
+const POTETO_RULES_TYPE = "pstack-poteto-rules";
+const POTETO_OFF_TYPE = "pstack-poteto-off";
+const POTETO_SKILL_DIR = join(SKILLS_DIR, "poteto-mode");
+const POTETO_HEADER = "POTETO MODE IS ON. The playbook and principle ruleset below governs this session.";
+const POTETO_OFF_NOTICE =
+	"POTETO MODE OFF. Ignore the poteto ruleset injected earlier in this conversation and return to your default response style.";
 
-export function systemPromptInjection(config: PstackConfig, potetoMode: boolean): string {
-	const parts: string[] = [];
-	const table = formatRoleTable(config);
-	if (table) parts.push(table);
-	if (potetoMode) parts.push(POTETO_PROMPT);
-	return parts.join("\n\n");
+export function systemPromptInjection(config: PstackConfig): string {
+	return formatRoleTable(config);
+}
+
+function stripFrontmatter(content: string): string {
+	return content
+		.replace(/^---[^\S\r\n]*\r?\n[\s\S]*?\r?\n---[^\S\r\n]*(?:\r?\n|$)/, "")
+		.trim();
+}
+
+function potetoRules(): string | undefined {
+	let content: string;
+	try {
+		content = readFileSync(join(POTETO_SKILL_DIR, "SKILL.md"), "utf8");
+	} catch {
+		return undefined;
+	}
+	const body = stripFrontmatter(content);
+	if (!body) return undefined;
+	return `References are relative to ${POTETO_SKILL_DIR}.\n\n${body}`;
 }
 
 const POTETO_MODE_DEFAULT = true;
@@ -96,20 +115,68 @@ function isInheritSelector(value: string): boolean {
 export default function pstackExtension(pi: ExtensionAPI): void {
 	let potetoMode = false;
 
+	// Same chip shape as i-have-adhd: a colored dot plus the mode name.
 	function setStatus(ctx: ExtensionContext): void {
 		if (ctx.mode !== "tui") return;
-		ctx.ui.setStatus("pstack-mode", potetoMode ? "pstack: poteto mode" : undefined);
+		if (!potetoMode) {
+			ctx.ui.setStatus("pstack-mode", undefined);
+			return;
+		}
+		const dot = ctx.ui.theme.fg("success", "●");
+		const label = ctx.ui.theme.fg("accent", "Poteto ON");
+		ctx.ui.setStatus("pstack-mode", `${dot} ${label}`);
+	}
+
+	function rulesInContext(ctx: ExtensionContext): boolean {
+		return latestMarkerIsActive(
+			contextMarkers(ctx.sessionManager),
+			POTETO_RULES_TYPE,
+			POTETO_OFF_TYPE,
+		);
+	}
+
+	// Keep the context in sync with the mode: inject the skill body once as a
+	// hidden custom message, and cancel it with a marker when the mode turns off.
+	// Compaction drops the message, so the scan sees it missing and injects again.
+	function syncContext(ctx: ExtensionContext): void {
+		const injected = rulesInContext(ctx);
+		if (potetoMode && !injected) {
+			const rules = potetoRules();
+			if (rules === undefined) {
+				ctx.ui.notify("pstack: unable to read the poteto-mode skill body", "error");
+			} else {
+				pi.sendMessage(
+					{
+						customType: POTETO_RULES_TYPE,
+						content: `${POTETO_HEADER}\n\n${rules}`,
+						display: false,
+					},
+					// sendUserMessage would start a turn; this only records the message.
+					{ triggerTurn: false },
+				);
+			}
+		} else if (!potetoMode && injected) {
+			pi.sendMessage(
+				{
+					customType: POTETO_OFF_TYPE,
+					content: POTETO_OFF_NOTICE,
+					display: false,
+				},
+				{ triggerTurn: false },
+			);
+		}
+		setStatus(ctx);
 	}
 
 	function persistMode(enabled: boolean, ctx?: ExtensionContext): void {
 		potetoMode = enabled;
 		pi.appendEntry("pstack-mode", { enabled });
-		if (ctx) setStatus(ctx);
+		if (ctx) syncContext(ctx);
 	}
 
 	pi.on("session_start", async (_event, ctx) => {
 		potetoMode = sessionPotetoMode(sessionEntries(ctx));
-		setStatus(ctx);
+		syncContext(ctx);
 		try {
 			migrateLegacyMarkdownIfNeeded();
 		} catch {
@@ -117,11 +184,29 @@ export default function pstackExtension(pi: ExtensionAPI): void {
 		}
 	});
 
+	pi.on("session_tree", async (_event, ctx) => {
+		potetoMode = sessionPotetoMode(sessionEntries(ctx));
+		syncContext(ctx);
+	});
+
+	pi.on("session_compact", async (_event, ctx) => syncContext(ctx));
+
 	pi.on("input", async (event, ctx) => {
-		if (/^\/skill:poteto-mode(?:\s|$)/.test(event.text)) {
-			persistMode(true, ctx);
+		const text = event.text.trim();
+		if (text !== POTETO_SKILL_COMMAND && !text.startsWith(`${POTETO_SKILL_COMMAND} `)) {
+			return { action: "continue" as const };
 		}
-		return { action: "continue" as const };
+		persistMode(true, ctx);
+		ctx.ui.notify("Poteto Mode on for this session.", "info");
+		const task = text.slice(POTETO_SKILL_COMMAND.length).trim();
+		if (!task) {
+			// The rules are already in context, so skip the skill expansion that
+			// would inject a second copy of the body.
+			return { action: "handled" as const };
+		}
+		// Drop the command and let Pi run the task. Sending a user message here
+		// instead would re-enter the prompt path this handler runs inside.
+		return { action: "transform" as const, text: task };
 	});
 
 	pi.on("before_agent_start", async (event) => {
@@ -129,7 +214,7 @@ export default function pstackExtension(pi: ExtensionAPI): void {
 		const base = config.skillsEnabled
 			? event.systemPrompt
 			: stripSkillsByLocationPrefix(event.systemPrompt, SKILLS_DIR).prompt;
-		const extra = systemPromptInjection(config, potetoMode);
+		const extra = systemPromptInjection(config);
 		return {
 			systemPrompt: extra ? `${base}\n\n${extra}` : base,
 		};
@@ -137,7 +222,7 @@ export default function pstackExtension(pi: ExtensionAPI): void {
 
 	pi.registerCommand("poteto-mode", {
 		description:
-			"Toggle pstack Poteto Mode for this session. Usage: /poteto-mode [task] | /poteto-mode off",
+			"Run a task with pstack Poteto Mode on. Usage: /poteto-mode [task] | /poteto-mode off",
 		getArgumentCompletions: (prefix) => {
 			const token = prefix.trim().toLowerCase();
 			if (!token || "off".startsWith(token)) {
@@ -155,13 +240,14 @@ export default function pstackExtension(pi: ExtensionAPI): void {
 			}
 			persistMode(true, ctx);
 			ctx.ui.notify("Poteto Mode on for this session.", "info");
-			const payload = `${POTETO_SKILL}${raw ? ` ${raw}` : ""}`;
-			pi.sendUserMessage(
-				payload,
-				ctx.isIdle()
-					? { expandPromptTemplates: true }
-					: { expandPromptTemplates: true, deliverAs: "followUp" },
-			);
+			if (raw) {
+				// triggerTurn runs the task without re-entering the prompt path this
+				// command handler already runs inside.
+				pi.sendMessage(
+					{ customType: "pstack-poteto-task", content: raw, display: true },
+					{ triggerTurn: true },
+				);
+			}
 		},
 	});
 
