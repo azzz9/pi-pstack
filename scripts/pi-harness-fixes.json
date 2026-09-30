@@ -201,6 +201,11 @@
 			"new": "Open the `todo` list whose first items are the matched playbook's steps, copied in verbatim, before any task-specific todos. A step you choose not to do stays in the list with a one-line `skip: <reason>`. Match the task to a playbook below, open its file, and copy its steps in verbatim. Keep the list with the `todo` tool from `@juicesharp/rpiv-todo`; if it is unavailable, keep the same list in `TODO.md` at the repo root."
 		},
 		{
+			"file": "skills/poteto-mode/SKILL.md",
+			"old": "Read the leaf skill in full for any principle you apply. Each entry names when it applies.",
+			"new": "Read the leaf skill in full for any principle you apply. Each leaf skill is a sibling of this file, at `../principle-<name>/SKILL.md`. Each entry names when it applies."
+		},
+		{
 			"file": "skills/reflect/references/divergent-reviewer.md",
 			"old": "- `Task` prompts that name a skill path",
 			"new": "- `subagent` prompts that name a skill path"

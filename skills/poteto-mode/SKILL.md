@@ -38,7 +38,7 @@ Remaining triggers:
 
 ## Principles
 
-Read the leaf skill in full for any principle you apply. Each entry names when it applies.
+Read the leaf skill in full for any principle you apply. Each leaf skill is a sibling of this file, at `../principle-<name>/SKILL.md`. Each entry names when it applies.
 
 **Core**
 
