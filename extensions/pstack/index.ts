@@ -48,7 +48,7 @@ function potetoRules(): string | undefined {
 	}
 	const body = stripFrontmatter(content);
 	if (!body) return undefined;
-	return `References are relative to ${POTETO_SKILL_DIR}.\n\n${body}`;
+	return `References in this ruleset are relative to ${POTETO_SKILL_DIR}. When another skill's file names a relative path, resolve it against that skill's own directory.\n\n${body}`;
 }
 
 const POTETO_MODE_DEFAULT = true;
