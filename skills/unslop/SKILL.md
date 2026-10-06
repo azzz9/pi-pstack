@@ -36,7 +36,7 @@ Rule numbers are stable ids that other skills cite. A removed rule leaves a gap.
 ### Style
 
 13. **Em dash overuse.** Avoid em dashes entirely. Use periods or commas only (no parentheses, no en dashes, no hyphen-as-dash substitutes). If a thought needs separation, end the sentence or use a comma.
-14. **Colon overuse.** Colons are fine before a list or example. Not as mid-sentence connectors.
+14. **Colon overuse.** Colons are fine before a list or example. Not as mid-sentence connectors. Rewrite to let the point stand on its own without comparison framing.
 15. **Boldface overuse.** Don't bold every proper noun or acronym.
 16. **Inline-header lists.** The tell is a bold label and colon that restates the line. Convert those to prose. A bold lead-in that ends in a period, names the item, and is followed by genuinely new detail is fine, not a tell.
 17. **Title case headings.** Use sentence case.
@@ -60,7 +60,7 @@ Rule numbers are stable ids that other skills cite. A removed rule leaves a gap.
 
 ### Plain speech
 
-27. **Say what it does, not how it feels.** Ask what the sentence tells the reader to do or know, then write that. If you can't restate it as a concrete instruction, fact, or number, cut it. One more check: if the sentence could appear unchanged in another project's docs, it says nothing about this one. Cut it.
+27. **Say what it does, not how it feels.** The fix names the mechanism or a number. Ask what the sentence tells the reader to do or know, then write that. If you can't restate it as a concrete instruction, fact, or number, cut it. One more check: if the sentence could appear unchanged in another project's docs, it says nothing about this one. Cut it.
 28. **Shorten or split dense sentences.** If the reader has to backtrack to parse a sentence, break it in two or drop clauses. One idea per sentence.
 29. **Active voice.** Prefer it. Catch "is/are/was/were + past participle" and name the actor. Passive is fine only when the actor is unknown or genuinely doesn't matter.
 30. **Cut adverbs, or use a stronger verb.** "runs quickly" becomes "is fast" or the number. "significantly improves" becomes the measured delta. An adverb propping up a weak verb means the verb is wrong.
