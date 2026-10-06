@@ -33,11 +33,12 @@ Fixes beyond upstream 0.6.0:
   `references/bugbot-triage.md` is renamed to `references/review-triage.md`.
 - The reground tool refuses to finish if any of those tokens survive a sync.
 
-## Required plugins
+## Plugins
 
-- [`@juicesharp/rpiv-todo`](https://www.npmjs.com/package/@juicesharp/rpiv-todo) provides the `todo` tool.
 - [`@juicesharp/rpiv-ask-user-question`](https://www.npmjs.com/package/@juicesharp/rpiv-ask-user-question)
   provides the `ask_user_question` tool.
+- [`@juicesharp/rpiv-todo`](https://www.npmjs.com/package/@juicesharp/rpiv-todo) provides the `todo`
+  tool. Optional. Without it the playbooks keep their list in `TODO.md` at the repo root.
 
 ## Install
 

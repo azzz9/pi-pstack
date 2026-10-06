@@ -27,12 +27,12 @@ To see whether Cursor's pstack moved past the version this tree was built from, 
 `npm run check-upstream`. It reads the committed `upstream.lock.json` and never writes it; a
 reground records the new sync point. [FORK.md](FORK.md) has the report layout and the exit codes.
 
-The port expects these alongside it:
+Install these alongside it:
 
 | Package | Why |
 | --- | --- |
 | [`pi-subagents`](https://www.npmjs.com/package/pi-subagents) | `poteto-agent`, `comment-sicko`, and the workflow fan-outs (`how`, `why`, `arena`, `swarm`, `interrogate`, `reflect`) |
-| [`@juicesharp/rpiv-todo`](https://www.npmjs.com/package/@juicesharp/rpiv-todo) | the `todo` tool the playbooks open |
+| [`@juicesharp/rpiv-todo`](https://www.npmjs.com/package/@juicesharp/rpiv-todo) | optional. The playbooks open its `todo` tool, and fall back to `TODO.md` at the repo root without it |
 | [`@juicesharp/rpiv-ask-user-question`](https://www.npmjs.com/package/@juicesharp/rpiv-ask-user-question) | the structured `ask_user_question` tool poteto-mode asks through |
 | [`bun`](https://bun.sh) | runs the bundled `orch` and `watch-pr` scripts |
 
