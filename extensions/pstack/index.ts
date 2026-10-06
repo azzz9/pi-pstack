@@ -25,7 +25,9 @@ const POTETO_SKILL_COMMAND = "/skill:poteto-mode";
 const POTETO_RULES_TYPE = "pstack-poteto-rules";
 const POTETO_OFF_TYPE = "pstack-poteto-off";
 const POTETO_SKILL_DIR = join(SKILLS_DIR, "poteto-mode");
-const POTETO_HEADER = "POTETO MODE IS ON. The playbook and principle ruleset below governs this session.";
+const POTETO_HEADER =
+	"POTETO MODE IS ON. The playbook and principle ruleset below governs this session.\n\n" +
+	"This message already carries the complete body of poteto-mode/SKILL.md. Do not read that file. Use this copy.";
 const POTETO_OFF_NOTICE =
 	"POTETO MODE OFF. Ignore the poteto ruleset injected earlier in this conversation and return to your default response style.";
 

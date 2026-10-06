@@ -111,6 +111,8 @@ describe("poteto skill command", () => {
 		assert.equal(sent[0].options.triggerTurn, false, "injecting the rules starts no turn");
 		assert.match(sent[0].message.content, /^POTETO MODE IS ON\./);
 		assert.match(sent[0].message.content, /Poteto Mode is on when a session starts/);
+		assert.match(sent[0].message.content, /already carries the complete body of poteto-mode\/SKILL\.md/);
+		assert.match(sent[0].message.content, /Do not read that file\./);
 		assert.match(sent[0].message.content, /References in this ruleset are relative to .*skills\/poteto-mode\./);
 		assert.match(sent[0].message.content, /another skill's file names a relative path/);
 		assert.deepEqual(userMessages, [], "the handler never sends a user message itself");
