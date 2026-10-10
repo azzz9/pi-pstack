@@ -34,7 +34,8 @@ Install these alongside it:
 | [`pi-subagents`](https://www.npmjs.com/package/pi-subagents) | `poteto-agent`, `comment-sicko`, and the workflow fan-outs (`how`, `why`, `arena`, `swarm`, `interrogate`, `reflect`) |
 | [`@juicesharp/rpiv-todo`](https://www.npmjs.com/package/@juicesharp/rpiv-todo) | optional. The playbooks open its `todo` tool, and fall back to `TODO.md` at the repo root without it |
 | [`@juicesharp/rpiv-ask-user-question`](https://www.npmjs.com/package/@juicesharp/rpiv-ask-user-question) | the structured `ask_user_question` tool poteto-mode asks through |
-| [`bun`](https://bun.sh) | runs the bundled `orch` and `watch-pr` scripts |
+| [`pnpm`](https://pnpm.io) | installs the dependencies of the bundled `orch` and `watch-pr` scripts |
+| [Node.js 24.2 or newer](https://nodejs.org) | runs the bundled `orch` and `watch-pr` scripts |
 
 ## Get started
 
@@ -58,7 +59,7 @@ The other skills are Hidden; the mode skill uses them as needed.
 - **2 subagents** (loaded by pi-subagents):
   - `poteto-agent`: runs poteto's style end to end. Reads `poteto-mode` in full before any work.
   - `comment-sicko`: read-only comment reviewer that savors deletion. Usually invoked through the `no-comments` skill.
-- **Bundled scripts** in `poteto-mode/scripts/`: the `orch` coordination CLI (orchestrate playbook) and the `watch-pr` watcher (babysit playbook), both under [bun](https://bun.sh); `worktree-audit.sh` for the worktree-cleanup playbook; and `check-plan.mjs`, the plan checker the multi-phase playbooks call.
+- **Bundled scripts** in `poteto-mode/scripts/`: the `orch` coordination CLI (orchestrate playbook) and the `watch-pr` watcher (babysit playbook). Both run under Node.js 24.2 or newer, and pnpm installs their dependencies on first use. The directory also holds `worktree-audit.sh` for the worktree-cleanup playbook, and `check-plan.mjs`, the plan checker the multi-phase playbooks call.
 
 ## Model roles
 
