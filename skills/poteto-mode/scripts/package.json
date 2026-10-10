@@ -2,15 +2,18 @@
   "name": "@zenspc/pi-pstack-tools",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=24.2.0"
+  },
   "scripts": {
-    "test": "bun test orch watch-pr",
+    "test": "node --test",
     "typecheck": "tsc --project watch-pr/tsconfig.json --noEmit --strict"
   },
   "dependencies": {
     "commander": "14.0.0"
   },
   "devDependencies": {
-    "bun-types": "latest",
+    "@types/node": "latest",
     "typescript": "latest"
   }
 }

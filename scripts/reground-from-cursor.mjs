@@ -51,11 +51,7 @@ export const CLASS_RULES = [
 	{ pattern: "skills/deslop/**", class: "pi-only" },
 	{ pattern: "skills/unslop/references/**", class: "pi-only" },
 	{ pattern: "skills/setup-pstack/SKILL.md", class: "pi-only" },
-	{ pattern: "skills/poteto-mode/scripts/check-plan.mjs", class: "pi-only" },
-	{ pattern: "skills/poteto-mode/scripts/check-plan.test.mjs", class: "pi-only" },
-	{ pattern: "skills/poteto-mode/scripts/package.json", class: "pi-only" },
-	{ pattern: "skills/poteto-mode/scripts/bun.lock", class: "pi-only" },
-	{ pattern: "skills/poteto-mode/scripts/worktree-audit.sh", class: "pi-only" },
+	{ pattern: "skills/poteto-mode/scripts/**", class: "pi-only" },
 
 	{ pattern: "skills/principle-*/**", class: "copy" },
 	{ pattern: "skills/typescript-best-practices/references/patterns.md", class: "copy" },
