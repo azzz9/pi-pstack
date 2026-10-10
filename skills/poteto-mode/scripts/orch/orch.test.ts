@@ -1,4 +1,7 @@
-import { afterEach, describe, expect, it } from "bun:test";
+import { spawn, spawnSync } from "node:child_process";
+import { once } from "node:events";
+import { afterEach, describe, it } from "node:test";
+import { expect } from "../expect.ts";
 import {
   chmod,
   mkdir,
@@ -20,7 +23,7 @@ import {
   type Store,
 } from "./store.ts";
 
-const SCRIPT = join(import.meta.dir, "orch.ts");
+const SCRIPT = join(import.meta.dirname, "orch.ts");
 const directories: string[] = [];
 const handles: Store[] = [];
 
@@ -62,8 +65,8 @@ function git({
   args: readonly string[];
   repo: string;
 }): string {
-  const result = Bun.spawnSync(["git", "-C", repo, ...args]);
-  if (result.exitCode !== 0) {
+  const result = spawnSync("git", ["-C", repo, ...args]);
+  if (result.status !== 0) {
     throw new Error(
       `git ${args.join(" ")} failed: ${result.stderr.toString()}`
     );
@@ -163,9 +166,9 @@ function runCli(
   args: readonly string[],
   env: Readonly<Record<string, string | undefined>> = process.env
 ): RunResult {
-  const result = Bun.spawnSync([process.execPath, SCRIPT, ...args], { env });
+  const result = spawnSync(process.execPath, [SCRIPT, ...args], { env });
   return {
-    code: result.exitCode,
+    code: result.status ?? 1,
     stdout: result.stdout.toString(),
     stderr: result.stderr.toString(),
   };
@@ -334,8 +337,8 @@ describe("Store", () => {
 
   it("replaces a stale lock whose holder pid is dead", async () => {
     const { directory } = await initializedStore();
-    const exited = Bun.spawn(["true"]);
-    await exited.exited;
+    const exited = spawn("true");
+    await once(exited, "exit");
     await writeFile(join(directory, ".orch.lock"), `${exited.pid}\n`);
 
     const stale: string[] = [];

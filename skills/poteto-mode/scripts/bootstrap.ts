@@ -1,8 +1,9 @@
+import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-const scriptsDirectory = import.meta.dir;
+const scriptsDirectory = import.meta.dirname;
 const nodeModulesDirectory = join(scriptsDirectory, "node_modules");
 const commanderPackagePath = join(
   nodeModulesDirectory,
@@ -18,7 +19,7 @@ function currentInstallKey(): string {
   return createHash("sha256")
     .update(readFileSync(join(scriptsDirectory, "package.json")))
     .update("\0")
-    .update(readFileSync(join(scriptsDirectory, "bun.lock")))
+    .update(readFileSync(join(scriptsDirectory, "pnpm-lock.yaml")))
     .digest("hex");
 }
 
@@ -32,31 +33,29 @@ export function ensureDependenciesInstalled(): void {
     return;
   }
 
-  const result = Bun.spawnSync(
-    [process.execPath, "install", "--frozen-lockfile"],
-    { cwd: scriptsDirectory }
-  );
-  if (result.exitCode !== 0) {
-    process.stdout.write(result.stdout);
-    process.stderr.write(result.stderr);
+  const installed = spawnSync("pnpm", ["install", "--frozen-lockfile"], {
+    cwd: scriptsDirectory,
+    encoding: "utf8",
+  });
+  if (installed.status !== 0) {
+    process.stdout.write(installed.stdout ?? "");
+    process.stderr.write(installed.stderr ?? "");
     throw new Error(
-      `bun install --frozen-lockfile exited with status ${result.exitCode}`
+      `pnpm install --frozen-lockfile exited with status ${installed.status}`
     );
   }
   if (!existsSync(commanderPackagePath)) {
     throw new Error(
-      "bun install --frozen-lockfile completed without installing commander"
+      "pnpm install --frozen-lockfile completed without installing commander"
     );
   }
 
   writeFileSync(installKeyPath, `${installKey}\n`);
 
-  const restarted = Bun.spawnSync([process.execPath, ...process.argv.slice(1)], {
+  const restarted = spawnSync(process.execPath, process.argv.slice(1), {
     cwd: process.cwd(),
     env: process.env,
-    stdin: "inherit",
-    stdout: "inherit",
-    stderr: "inherit",
+    stdio: "inherit",
   });
-  process.exit(restarted.exitCode ?? 1);
+  process.exit(restarted.status ?? 1);
 }

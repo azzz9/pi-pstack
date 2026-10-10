@@ -227,11 +227,11 @@ export interface NotFoundOutput {
 export class UserError extends Error {}
 export class UsageError extends UserError {}
 export class NotFoundError extends UserError {
-  public constructor(
-    message: string,
-    public readonly output?: NotFoundOutput
-  ) {
+  readonly output?: NotFoundOutput;
+
+  public constructor(message: string, output?: NotFoundOutput) {
     super(message);
+    this.output = output;
   }
 }
 

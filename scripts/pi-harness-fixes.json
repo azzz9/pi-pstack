@@ -309,6 +309,16 @@
 			"file": "skills/principle-explain-the-number/SKILL.md",
 			"old": "with the [benchmark-checklist](../benchmark-checklist/SKILL.md) skill.",
 			"new": "with the benchmark checklist."
+		},
+		{
+			"file": "skills/poteto-mode/playbooks/orchestrate.md",
+			"old": "Use `bun scripts/orch/orch.ts` for bookkeeping",
+			"new": "Use `node scripts/orch/orch.ts` for bookkeeping"
+		},
+		{
+			"file": "skills/reflect/references/synthesizer.md",
+			"old": "- \"skill-bundled scripts run under bun with own lockfile, not pnpm workspace\"",
+			"new": "- \"skill-bundled scripts run under Node with their own lockfile, not a parent workspace\""
 		}
 	],
 	"renames": [
